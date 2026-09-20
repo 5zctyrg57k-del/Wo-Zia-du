@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-Hant-HK">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>《我喺度》</title>
+<style>
+:root{--bg:#0b1427;--bg2:#17243a;--ink:#f8f2df;--muted:#b9c4d2;--accent:#d7c89e;--glass:rgba(255,255,255,.09);--line:rgba(255,255,255,.16);}
+*{box-sizing:border-box} html,body{margin:0;min-height:100%;background:radial-gradient(circle at 50% 10%,#243452 0,#111d32 42%,#080f1e 100%);color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans TC","PingFang HK",sans-serif} body{min-height:100vh;overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;background:linear-gradient(125deg,rgba(151,164,204,.05),transparent 35%,rgba(215,200,158,.04));}
+button{font:inherit;color:inherit;border:1px solid var(--line);background:var(--glass);border-radius:999px;cursor:pointer;transition:transform .3s ease,background .3s ease,box-shadow .3s ease,border-color .3s ease}button:hover,button:focus-visible{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.35);box-shadow:0 0 24px rgba(215,200,158,.15);transform:translateY(-1px);outline:none}button:active{transform:translateY(0)}
+#app{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px 20px 76px}.screen{width:min(900px,100%);text-align:center;animation:fade .8s ease both}@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.eyebrow{font-size:.78rem;letter-spacing:.28em;color:var(--muted);margin-bottom:22px}.title{font-size:clamp(2.5rem,9vw,5.4rem);font-weight:300;letter-spacing:.16em;margin:0 0 24px}.lead{font-size:clamp(1.25rem,3vw,1.75rem);line-height:2;color:var(--ink);font-weight:300;white-space:pre-line}.sub{font-size:.92rem;color:var(--muted);line-height:1.8}.small-note{font-size:.78rem;color:#9caabd;margin-top:15px}
+.primary{padding:13px 34px;margin-top:26px;font-size:1.08rem;background:rgba(215,200,158,.16);border-color:rgba(215,200,158,.5)}.quiet{padding:10px 18px;font-size:.92rem;color:var(--muted)}.exit{position:fixed;right:18px;bottom:18px;padding:8px 15px;font-size:.78rem;color:#aeb9c7;background:rgba(5,10,20,.35);z-index:5}.back{position:fixed;left:18px;bottom:18px;padding:8px 15px;font-size:.78rem;color:#aeb9c7;background:rgba(5,10,20,.35);z-index:5}
+.room-head{margin-bottom:30px}.room-head h2{font-size:clamp(1.7rem,4vw,2.5rem);font-weight:350;margin:0 0 10px}.greeting{color:var(--muted);font-size:1rem}.doors{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px;margin:24px auto;max-width:760px}.door{min-height:126px;border-radius:22px;padding:22px 14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:linear-gradient(145deg,var(--door),rgba(255,255,255,.04));border-color:rgba(255,255,255,.2);box-shadow:inset 0 1px rgba(255,255,255,.1)}.door-icon{font-size:1.7rem;opacity:.88}.door-name{font-size:1.08rem}.door:hover{box-shadow:0 0 25px color-mix(in srgb,var(--door),transparent 55%)}.sit{margin:16px auto 0;padding:14px 26px;display:block}.event{max-width:700px;margin:0 auto}.event h2{font-weight:350;font-size:clamp(1.6rem,4vw,2.4rem);margin:0 0 25px}.event-text{font-size:clamp(1.24rem,3vw,1.65rem);line-height:2.05;white-space:pre-line;min-height:130px;display:flex;align-items:center;justify-content:center}.choices{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:28px}.choice{padding:12px 20px}.quote{font-size:clamp(1.35rem,3.5vw,1.9rem);line-height:2.1;white-space:pre-line;margin:20px auto 30px;max-width:680px}.notice{margin:24px auto 0;padding:14px 18px;border:1px solid rgba(215,200,158,.25);border-radius:15px;color:#ddd3b5;background:rgba(215,200,158,.07);max-width:600px;line-height:1.75;font-size:.92rem}.safety{position:fixed;left:18px;top:16px;font-size:.72rem;color:#9eacbe;text-decoration:none;opacity:.8}.safety:hover{opacity:1;text-decoration:underline}
+@media(max-width:520px){#app{padding-top:55px}.doors{grid-template-columns:repeat(2,1fr);gap:10px}.door{min-height:112px;padding:15px 8px}.title{letter-spacing:.1em}.exit{right:12px;bottom:12px}.back{left:12px;bottom:12px}.choices{gap:9px}.choice{padding:11px 14px}}
+</style>
+</head>
+<body>
+<a class="safety" href="#" id="safetyLink">如果你而家有即時危險：請聯絡身邊可信任的人或當地急救服務</a>
+<main id="app" aria-live="polite"></main>
+<script>
+const opening=["呢度冇正確答案。","你唔需要知道聽日嘅意義。","你唔需要知道自己點解唔開心。","你只需要知道：你唔使一個人。","你嚟到呢度，已經好夠。"];
+const greetings=["你返嚟啦。","今日點呀？","你嚟到呢度，已經好夠。","我見到你喺度。","唔使急，呢度等緊你。"];
+const doors=[
+ {name:"一杯熱嘢",icon:"☕",color:"#8a6f69",text:["你拎起杯，感覺到熱力由手心傳上嚟。你唔需要飲。你只需要知道，杯喺度。我喺度。","杯裡面有蒸氣升起。你望住啲煙，乜都唔使做。我喺度。","你雙手捧住杯。溫度慢慢傳到全身。你唔需要講嘢。我喺度。","杯係熱嘅。你係度。呢兩樣嘢就夠。我喺度。","你聞到少少香味。你唔需要覺得好飲。你只需要知道，呢一刻你喺度。我喺度。"]},
+ {name:"一盆植物",icon:"✿",color:"#5c857c",text:["葉尖有一點光。你唔需要照顧佢，亦唔需要照顧好自己。你可以只係望住。我喺度。","植物慢慢呼吸，或者只係咁樣生存住。你都可以用自己嘅速度。我喺度。","泥土有淡淡嘅氣味。呢一刻冇要求你變好。我喺度。","有一片葉微微郁咗。你睇到，又或者你冇睇到，都冇關係。我喺度。","佢唔問你今日做成點。佢只係同你一齊喺度。我喺度。"]},
+ {name:"一首歌",icon:"♫",color:"#716c9d",text:["聲音由遠處嚟，輕輕停喺房入面。你唔需要聽完整首。我喺度。","有啲音符經過你身邊。你有感覺或者冇感覺，都可以。我喺度。","旋律唔會要求你明白。佢只係陪你過一陣。我喺度。","你可以調細聲，亦可以關掉。你嘅選擇唔會令人失望。我喺度。","呢首歌唔需要帶你去任何地方。你留喺呢度就可以。我喺度。"]},
+ {name:"一張床",icon:"⌁",color:"#657b9c",text:["床承托住你。你唔需要即刻瞓著，亦唔需要起身。我喺度。","被鋪有少少重量，落喺身上。你可以交畀佢托住一陣。我喺度。","你望住天花板，時間行得慢啲。唔使追。我喺度。","你可以蜷住、攤開，或者只係坐喺床邊。我喺度。","今晚唔需要解決人生。依家只需要有一個可以休息嘅地方。我喺度。"]},
+ {name:"一扇窗",icon:"□",color:"#557c9b",text:["窗外嘅世界仲喺度，但你唔需要而家出去。你可以隔住玻璃望一陣。我喺度。","光線慢慢變化。你唔需要追住佢，佢會自己經過。我喺度。","窗係開定關，都由你決定。你可以保護自己。我喺度。","外面有人行過，世界繼續郁。你唔需要跟上。我喺度。","你望到天空，或者只係望到一片黑。兩樣都可以。我喺度。"]},
+ {name:"一塊布",icon:"▱",color:"#8b7890",text:["布料喺指尖之間，有一點粗糙或者柔軟。你可以只係感覺佢。我喺度。","你摺一摺布，又或者唔摺。冇任何事需要完成。我喺度。","一點溫度留喺布上。你唔需要留住任何感覺。我喺度。","布可以包住你一陣。你唔需要向任何人解釋。我喺度。","你捉住佢，鬆開佢。每一個動作都已經足夠。我喺度。"]},
+ {name:"一支筆",icon:"✎",color:"#8f7d61",text:["你可以喺紙上留一條線，亦可以唔寫。冇人會評分。我喺度。","筆尖停喺紙面。空白唔代表你失敗。我喺度。","你可以寫一個字：『喺度』。又或者只係握住支筆。我喺度。","有啲嘢未必可以講出嚟。你唔講，都會有人陪你。我喺度。","線條歪咗亦冇所謂。你唔需要整齊先值得被留低。我喺度。"]},
+ {name:"一面鏡",icon:"◯",color:"#66818b",text:["鏡入面係你。你唔需要喜歡見到嘅自己，我仍然會留低。我喺度。","你可以望一眼就移開。你唔需要同自己對視。我喺度。","你嘅樣貌唔需要證明任何嘢。今日嘅你都值得安全。我喺度。","鏡面有啲霧，睇唔清楚亦可以。你唔需要而家了解自己。我喺度。","你唔係一個需要被修理嘅問題。你係一個值得被陪嘅人。我喺度。"]},
+ {name:"一個攬枕",icon:"♡",color:"#806d82",text:["攬枕冇問題要你回答。你可以攬住佢，或者只係放喺身邊。我喺度。","柔軟嘅重量靠住你。你唔需要自己撐住所有嘢。我喺度。","攬枕唔會問你點解。佢只係畀你一個位置。我喺度。","你可以將面埋落去，慢慢呼吸。唔使急。我喺度。","你唔需要有人嘅力氣先可以休息。呢一刻，有嘢陪住你。我喺度。"]},
+ {name:"一杯水",icon:"◌",color:"#56829a",text:["水面反射一點光。你可以飲一啖，或者只係望住。我喺度。","杯邊有清涼嘅水氣。你唔需要一次過照顧好自己。我喺度。","一小口都算。一滴都算。乜都冇做，亦唔代表你冇努力。我喺度。","水喺杯入面安靜咁留住。你都可以留喺呢一刻。我喺度。","你可以將杯放低。你唔需要做得完美先配得上被照顧。我喺度。"]}
+];
+const sitTexts=["你坐低。房間冇催你。你唔需要起身。我喺度。","你乜都冇做，而呢個都係一個選擇。我喺度。","時間喺你身邊慢慢行。你可以唔跟住佢。我喺度。","你嘅呼吸可能好淺、好亂，甚至感覺唔到。都可以。我喺度。","你唔需要搵到答案先可以留低。我喺度。"];
+const phone={title:"電話響",text:{"聽":["電話響咗一陣。你聽唔聽，都唔代表你對任何人有責任。我喺度。","另一邊可能有人，也可能只係安靜。你接起或者放低，都可以。我喺度。","你唔需要準備好先可以聽一聲。我喺度。","鈴聲停咗。你仍然喺度，並冇做錯任何嘢。我喺度。","如果你想，可以搵一個你信任嘅人。唔知點講，講『陪我一陣』都夠。我喺度。"],"唔聽":["你冇接。你有權利唔回應。呢個選擇唔會令你變成壞人。我喺度。","電話留低一個未接來電。你可以遲啲先處理，或者唔處理。我喺度。","你將自己嘅安靜放喺前面。呢一刻，你可以保護自己。我喺度。","你唔聽電話，唔代表你消失咗。你仍然喺度。我喺度。","冇人要求你用一個狀態去解釋另一個狀態。我喺度。"],"熄咗佢":["你將電話調靜。房間重新安靜落嚟。我喺度。","你暫時熄咗外面嘅聲音。你可以將注意力放返喺自己身上。我喺度。","電話黑咗落嚟，唔代表你要消失。你仍然可以留低。我喺度。","你為自己留出一點空間。空間唔係拒絕任何人。我喺度。","你可以稍後再開返，亦可以唔諗住稍後。我喺度。"]}};
+const hand={title:"你望住自己隻手",text:{"擺低手，深呼吸":["你將手放喺一個安全嘅地方。唔使吸得好深，只要一口一口。我喺度。","手掌貼住布料，身體有一點位置可以返嚟。我喺度。","你唔需要令呼吸變得完美。你只需要陪住下一口氣。我喺度。","你放鬆一隻手指，再放鬆另一隻。慢慢嚟。我喺度。","如果深呼吸唔舒服，正常咁呼吸都已經可以。我喺度。"],"打電話畀人":["你可以撥畀一個可信任嘅人，只講：『你可唔可以陪我？』我喺度。","你唔需要解釋完整件事。有人知道你而家唔安全，已經好重要。我喺度。","如果你有傷害自己嘅衝動，請搵身邊嘅人即刻陪住你，或者聯絡當地急救服務。我喺度。","你將呢一刻交畀另一個人一齊承受。唔係麻煩，係求生。我喺度。","電話喺手邊。你可以按下一個名字，慢慢嚟。我喺度。"],"攞起一樣嘢揸住":["你揸住柔軟、冰涼或有紋理嘅安全物件。讓手有一個安全嘅去處。我喺度。","你感覺物件嘅重量。請避開任何可能令你受傷嘅東西。我喺度。","你可以握緊一陣，再慢慢鬆開。唔需要責怪自己。我喺度。","安全嘅觸感由手心傳返嚟。你唔需要即刻平靜。我喺度。","你搵到一個唔會傷害你嘅物件。呢個小小選擇值得被看見。我喺度。"],"乜都唔做，由得隻手抖":["隻手抖緊。你唔需要阻止佢先算勇敢。我喺度。","你可以讓身體做佢而家做緊嘅事，同時把危險物品推遠。我喺度。","抖動會變化，唔一定要而家停。請讓一個可信任嘅人知道你需要陪伴。我喺度。","你冇做錯。身體有時用自己嘅方法撐住你。我喺度。","如果你擔心會傷害自己，請即刻搵人到你身邊，或打當地急救電話。我喺度。"]}};
+let state={visited:new Set(),sitCount:0,sessionDoors:new Set()};
+const app=document.getElementById('app'); const pick=a=>a[Math.floor(Math.random()*a.length)];
+function shell(content,opts={}){app.innerHTML='<section class="screen">'+content+'</section>'+(opts.back?'<button class="back" onclick="room()">返去房間</button>':'')+'<button class="exit" onclick="leave()">離開</button>';}
+function start(){shell(`<div class="eyebrow">一個可以留低嘅地方</div><h1 class="title">我喺度</h1><p class="lead">${pick(opening)}</p><button class="primary" onclick="room()">入去</button><div class="small-note">你可以隨時走。</div><div class="notice">如果你而家有即時危險、已經受傷，或者擔心自己會傷害自己，請停止遊戲，聯絡身邊可信任的人、當地急救服務或急診。</div>`);}
+function shuffledDoors(){return [...doors].sort(()=>Math.random()-.5).slice(0,3+Math.floor(Math.random()*2));}
+function room(){let chosen=shuffledDoors(); let doorHtml=chosen.map((d,i)=>`<button class="door" style="--door:${d.color}" onclick="visit(${doors.indexOf(d)})"><span class="door-icon">${d.icon}</span><span class="door-name">${d.name}</span></button>`).join(''); let extra=state.sessionDoors.size>=5?'<div class="notice">你去咗好多地方。但你唔需要去邊度。我喺度。</div>':''; shell(`<div class="room-head"><div class="eyebrow">房間</div><h2>${pick(greetings)}</h2><div class="greeting">門會每次重新出現。你可以揀一度，或者唔揀。</div></div><div class="doors">${doorHtml}</div><button class="sit" onclick="sit()">坐低，乜都唔做</button>${extra}`); maybeEvent();}
+function maybeEvent(){let r=Math.random(); if(r<.3)setTimeout(()=>phoneEvent(),500); else if(r<.5)setTimeout(()=>handEvent(),500);}
+function visit(i){state.sitCount=0;state.sessionDoors.add(i);state.visited.add(i); let d=doors[i]; showResult(d.name,pick(d.text),true);}
+function sit(){state.sitCount++; if(state.sitCount>=3){showResult('坐低，乜都唔做','你坐咗好耐。呢個都可以。我喺度。',true);return} showResult('坐低，乜都唔做',pick(sitTexts),true);}
+function showResult(title,text,allowStay){shell(`<div class="event"><div class="eyebrow">${title}</div><p class="quote">${text}</p><div class="choices"><button class="choice" onclick="room()">返去房間</button>${allowStay?'<button class="choice" onclick="stay(\''+title+'\')">喺度坐一陣</button>':''}</div></div>`,{back:false});}
+function stay(title){let pool=title==='坐低，乜都唔做'?sitTexts:doors.find(d=>d.name===title)?.text||sitTexts;showResult(title,pick(pool),false);setTimeout(room,2600);}
+function phoneEvent(){shell(`<div class="event"><div class="eyebrow">有一陣聲音</div><h2>電話響</h2><p class="event-text">你唔需要即刻決定要唔要接。</p><div class="choices">${Object.keys(phone.text).map(k=>`<button class="choice" onclick="phoneChoice('${k}')">${k}</button>`).join('')}</div></div>`);}
+function phoneChoice(k){showResult('電話',pick(phone.text[k]),false);setTimeout(room,2400);}
+function handEvent(){shell(`<div class="event"><div class="eyebrow">一個小小嘅片刻</div><h2>你望住自己隻手</h2><p class="event-text">你可以做任何令自己安全一點嘅選擇，亦可以暫時唔做。</p><div class="choices">${Object.keys(hand.text).map(k=>`<button class="choice" onclick="handChoice('${k}')">${k}</button>`).join('')}</div></div>`);}
+function handChoice(k){showResult('你嘅手',pick(hand.text[k]),false);setTimeout(room,2700);}
+function leave(){shell(`<div class="event"><div class="eyebrow">離開之前</div><p class="quote">你可以隨時返嚟。<br>你可以隨時走。<br>你可以乜都唔做。<br>我喺度。</p><div class="choices"><button class="choice" onclick="room()">返去</button><button class="choice" onclick="closeGame()">真正關閉</button></div></div>`);}
+function closeGame(){document.body.innerHTML='<main id="app"><section class="screen"><div class="eyebrow">我喺度</div><p class="quote">你可以關掉呢一頁。<br>請記住：如果你而家有即時危險，搵一個可信任嘅人陪住你，並聯絡當地急救服務。</p></section></main>';}
+document.getElementById('safetyLink').addEventListener('click',e=>{e.preventDefault();alert('如果你而家有即時危險、已經受傷，或者擔心自己會傷害自己：請立即搵身邊可信任嘅人陪住你，並聯絡當地急救服務（例如中國大陸 120／110）。');});
+start();
+</script>
+</body>
+</html>
